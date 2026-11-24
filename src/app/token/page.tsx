@@ -34,7 +34,7 @@ export default function TokenPage() {
             Network: {CHAIN.name} (chain {CHAIN.id}), gas paid in {CHAIN.nativeSymbol}. {TOKEN.isLive ? "" : "Launchpad: TBA. "}We never send direct messages first.
           </p>
         </section>
-        <section className="card outline" id="utility">
+        <section className="card lined" id="utility">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="t-h3">Planned use</h2>
             <Status kind="concept" />

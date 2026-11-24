@@ -118,7 +118,7 @@ export function DeployPanel() {
           </p>
         ) : null}
       </div>
-      <div className="card outline">
+      <div className="card lined">
         <h2 className="t-h3">Before you deploy</h2>
         <ul className="mt-3 grid list-disc gap-2 pl-5 text-[14px] muted">
           <li>The contract never holds funds and has no payable function or receive(). Payments are transferFrom owner → provider in one transaction.</li>

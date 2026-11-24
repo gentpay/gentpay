@@ -43,7 +43,7 @@ export default function HowPage() {
       <div className="wrap grid gap-4 pb-28">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {RULES.map(([t, d]) => (
-            <div key={t} className="card outline">
+            <div key={t} className="card lined">
               <h2 className="text-[28.5px] leading-[1.1] tracking-[-0.02em]">{t}</h2>
               <p className="muted mt-3 text-[15px]">{d}</p>
             </div>
@@ -55,7 +55,7 @@ export default function HowPage() {
           <p className="t-small muted">checkPay returns a bitmask; pay() reverts with Refused(mask). Same bits in the contract, the site and the example agent.</p>
           <div className="rows mt-3">
             {REASONS.map((r) => (
-              <div key={r.key} className="kv">
+              <div key={r.key} className="kv stack">
                 <span className="t-num text-[12px]">
                   bit {r.bit} · {r.key}
                 </span>

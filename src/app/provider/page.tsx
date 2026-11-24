@@ -29,7 +29,7 @@ export default function ProviderPage() {
       <div className="wrap grid gap-4 pb-28">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(([t, d], i) => (
-            <div key={t} className="card outline">
+            <div key={t} className="card lined">
               <p className="t-num text-[13px] dim">0{i + 1}</p>
               <h2 className="mt-3 text-[28.5px] leading-[1.1] tracking-[-0.02em]">{t}</h2>
               <p className="muted mt-3 text-[15px]">{d}</p>

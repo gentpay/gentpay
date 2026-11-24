@@ -335,7 +335,7 @@
   .card.light .muted {
     color: #4a4c56;
   }
-  .card.outline {
+  .card.lined {
     background: transparent;
     border: 1px solid var(--line);
     border-radius: 22.5px;
@@ -1352,5 +1352,17 @@
   html:not(.motion) .grow-h {
     filter: none;
     opacity: 1;
+  }
+}
+
+@layer components {
+  @media (max-width: 640px) {
+    .kv.stack {
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kv.stack > :last-child {
+      text-align: left;
+    }
   }
 }

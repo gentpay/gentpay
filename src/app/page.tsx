@@ -235,7 +235,7 @@ export default function Home() {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {BENTO.map((b) => (
-              <div key={b.t} className={`card ${b.light ? "light" : "outline"} flex min-h-[230px] flex-col justify-between`}>
+              <div key={b.t} className={`card ${b.light ? "light" : "lined"} flex min-h-[230px] flex-col justify-between`}>
                 <div>
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="text-[28.5px] leading-[1.1] tracking-[-0.02em]">{b.t}</h3>

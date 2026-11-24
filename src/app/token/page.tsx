@@ -21,7 +21,10 @@ export default function TokenPage() {
       </PageHead>
       <div className="wrap grid grid-cols-1 gap-4 pb-28 lg:grid-cols-2">
         <section className="card" data-testid="token-ca" data-noauto="">
-          <h2 className="t-h3">Contract address</h2>
+          <div className="flex items-center gap-4">
+            <img src="/brand/mark-tile.webp?v=522ed737" alt={`${BRAND.symbol} token logo`} width={72} height={72} className="h-[72px] w-[72px] rounded-[18px]" data-testid="token-logo" />
+            <h2 className="t-h3">Contract address</h2>
+          </div>
           <p className="muted mt-3 text-[15px]">
             {TOKEN.isLive
               ? `The only ${BRAND.symbol} contract on ${CHAIN.name}. Copies with the same name can exist; check the address.`

@@ -21,7 +21,7 @@ const SLUG = "gentpay";
 const TICKER = "GENTPAY";
 const DOMAIN = "gentpay.xyz";
 /** X account of the project (the owner's handle, exactly as written in the order). */
-const X_HANDLE = "gentpay";
+const X_HANDLE = "gentpayxyz";
 
 export const BRAND = {
   name: NAME,
@@ -43,7 +43,7 @@ export const BRAND = {
   x: `https://x.com/${X_HANDLE}`,
   xHandle: `@${X_HANDLE}`,
   // Public source repository: hidden until it exists.
-  github: "",
+  github: "https://github.com/gentpay/gentpay",
   ca: CA,
 } as const;
 

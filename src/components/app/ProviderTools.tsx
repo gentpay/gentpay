@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { keccak256, stringToHex } from "viem";
-import { CHAIN, explorerTx } from "@/config/brand";
+import { BRAND, CHAIN, explorerTx } from "@/config/brand";
 import { CONTRACTS, contractLive } from "@/config/contracts";
 import { DEFAULT_STABLE, STABLES, stableByAddress } from "@/config/tokens";
 import { useWallet } from "@/components/wallet/WalletProvider";
@@ -32,11 +32,75 @@ export function Live402() {
         <>
           <p className="t-num mt-3 text-[22px]">HTTP {res.status}</p>
           <pre className="t-num mt-3 max-h-[340px] overflow-auto whitespace-pre-wrap break-words rounded-[12px] bg-black/40 p-4 text-[12px] leading-[1.5]">{JSON.stringify(res.body, null, 2)}</pre>
-          {res.status === 503 ? <p className="t-small muted mt-2">503 = the contract or the sample provider is not deployed/registered yet. After deployment this answers 402 with the on-chain price.</p> : null}
+          {res.status === 503 ? <p className="t-small muted mt-2">503 = the sample provider is not registered in the contract yet. Once it is, this answers 402 with its on-chain price.</p> : null}
         </>
       ) : !err ? (
         <p className="t-small muted mt-3">Asking…</p>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Registers THIS site's sample provider (registerProvider is open to any wallet on chain: the caller becomes the provider's
+ * controller). 1 unit per call, terms hash = the sample route's URL, then setPrice to 0.002 USDG per unit. The new id is read back
+ * from providersOf(wallet) and shown with the one config line to paste. Shown only while no sample provider is configured.
+ */
+export function RegisterSampleProvider() {
+  const { address, sendTransaction } = useWallet();
+  const { open } = useWalletModal();
+  const [payout, setPayout] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [done, setDone] = useState<{ id: number; tx: string } | null>(null);
+  if (!contractLive() || CONTRACTS.sampleProvider) return null;
+  async function run() {
+    if (!address) return open();
+    const to = payout || address;
+    if (!/^0x[0-9a-fA-F]{40}$/.test(to)) return setMsg("Payout must be an address.");
+    setMsg(null);
+    try {
+      setBusy("Registering (1 of 2)…");
+      const r1 = await send(address, CONTRACTS.contract, enc.register(to, 1, keccak256(stringToHex(`${BRAND.url}/api/provider/sample`))), sendTransaction);
+      const ids = await providersOf(address);
+      const id = ids[ids.length - 1];
+      if (!id) throw new Error("Registered, but the new provider id could not be read. Check the transaction on the explorer.");
+      setBusy("Setting the price (2 of 2)…");
+      await send(address, CONTRACTS.contract, enc.setPrice(id, DEFAULT_STABLE.address, 2000n), sendTransaction);
+      setDone({ id, tx: r1.hash });
+    } catch (e) {
+      setMsg(explain(e));
+    } finally {
+      setBusy(null);
+    }
+  }
+  return (
+    <div className="card" data-noauto="" data-testid="sample-register">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-[21px]">Register this site&apos;s sample provider</h3>
+        <span className="badge">Not registered yet</span>
+      </div>
+      <p className="muted mt-2 text-[15px]">
+        The sample route answers &quot;not configured&quot; until a provider for it exists in the contract. Two transactions from your wallet: register (1 unit per
+        call) and set the price to 0.002 {DEFAULT_STABLE.symbol} per unit. Anyone can register a provider; the site only uses the id its operator configures.
+      </p>
+      <label className="field mt-4">
+        <span>Payout address (empty = this wallet). Use an address that is not the owner of the tasks you will test with.</span>
+        <input className="input t-num text-[13px]" value={payout} onChange={(e) => setPayout(e.target.value.trim())} placeholder="0x…" />
+      </label>
+      <button type="button" className="pill mt-4" disabled={!!busy} onClick={run} data-testid="sample-register-go">
+        {busy ?? (address ? "Register the sample provider" : "Connect wallet")}
+      </button>
+      {done ? (
+        <p className="mt-4 text-[14px] text-[var(--good)]" data-testid="sample-register-done">
+          Provider #{done.id} registered and priced (
+          <a className="ulink" href={explorerTx(done.tx)} target="_blank" rel="noreferrer">
+            tx
+          </a>
+          ). Operator: set <code className="t-num">sampleProvider: {done.id}</code> in src/config/contracts.ts and redeploy the site.
+        </p>
+      ) : null}
+      {msg ? <p className="rq-alert mt-3">{msg}</p> : null}
     </div>
   );
 }

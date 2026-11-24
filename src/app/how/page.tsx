@@ -84,7 +84,7 @@ export default function HowPage() {
               </div>
               <div className="kv">
                 <span>Deployment gas</span>
-                <span className="t-num">about 2.7 million (forge)</span>
+                <span className="t-num">2,664,793 (deployment transaction)</span>
               </div>
               <div className="kv">
                 <span>Tests</span>

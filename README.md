@@ -20,9 +20,10 @@ This repository is the working code behind https://gentpay.xyz.
   (`0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`, 6 decimals) and USDe (`0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34`, 18 decimals) —
   with their supply and Chainlink price feeds. Tokens named USDC or USDT on this chain were not offered: every candidate found was a
   lookalike.
-- **The contract is not deployed yet.** It is non-custodial (payments are one `transferFrom` from the owner to the provider), has
-  no owner, admin, fee or upgrade, and was tested with unit, hostile-token, fuzz, invariant and Robinhood Chain fork tests plus a
-  written self-review — but no outside security review. Start with small budgets.
+- **The contract is live on Robinhood Chain** at `0x14fc46155c4091bd7bf80012874ee973927e87fe` (source verified). It is
+  non-custodial (payments are one `transferFrom` from the owner to the provider), has no owner, admin, fee or upgrade, and was tested
+  with unit, hostile-token, fuzz, invariant and Robinhood Chain fork tests plus a written self-review — but no outside security review.
+  Start with small budgets. The site's sample provider answers "not configured" until it is registered on chain.
 - **"x402-style", not x402.** The sample provider answers 402 and accepts a Gentpay receipt as proof; it is not the x402 payment
   header, and no x402 client was tested.
 - **Planned, not built:** a provider directory, session keys across tasks, recurring payments, native ETH payments, and any utility for
@@ -32,7 +33,7 @@ This repository is the working code behind https://gentpay.xyz.
 
 | Path | What it is |
 |---|---|
-| `src/app/` | Pages (home, `/app`, `/provider`, `/receipts`, `/how`, `/token`, localhost-only `/deploy`) and API routes (`/api/chain`, `/api/rpc`, `/api/receipts`, `/api/provider/sample`). |
+| `src/app/` | Pages (home, `/app`, `/provider`, `/receipts`, `/how`, `/token`) and API routes (`/api/chain`, `/api/rpc`, `/api/receipts`, `/api/provider/sample`). |
 | `src/components/` | Interface components: the task dashboard (practice and live), provider tools, the wallet dialog, motion. |
 | `src/config/` | `brand.ts` (name, ticker, token address, links), `contracts.ts` (deployed address, block, sample provider id), `tokens.ts` (the proven stablecoins). |
 | `src/lib/gentpay/` | Reason bits (same as the Solidity library), the request hash, the practice engine and the browser contract calls. |
@@ -68,7 +69,8 @@ forge test --match-contract Fork --fork-url https://rpc.mainnet.chain.robinhood.
 Robinhood Chain with real USDG and USDe. A browser run on a local fork of Robinhood Chain (chain id 4663, injected test wallet, the
 example agent) passed 10 of 10 steps: create a task, pay, refuse over budget and over the unit limit, receipt lookup, replayed receipt
 refused, pause and close, provider registration. Measured gas there: deployment 2,664,793; first payment in a task 352,171.
-Not run: anything against a deployed contract on mainnet (none exists yet).
+2026-11-24 UTC, after the mainnet deployment: `verify-deployment` against Robinhood Chain printed MATCH (runtime and creation input);
+the source is verified on Sourcify (full match) and on Blockscout.
 
 ## Look at the site
 
@@ -79,14 +81,17 @@ npm start
 ```
 
 Open http://localhost:6660. With no configuration the site reads Robinhood Chain through its public RPC, practice mode works, and
-the live dashboard, receipts and sample provider say "not deployed" until `src/config/contracts.ts` holds a deployed address.
+the live dashboard and receipts read the deployed contract; the sample provider answers 503 "not configured" until a provider id is
+set as `sampleProvider` in `src/config/contracts.ts`.
 Optional variables are listed under "Deploy your own".
 
 ## Contracts
 
 | Contract | Address | Explorer |
 |---|---|---|
-| `GentpayTaskBudgets` (with the internal library `GentpayReceiptMath`) | not deployed yet | — |
+| `GentpayTaskBudgets` (with the internal library `GentpayReceiptMath`) | `0x14fc46155c4091bd7bf80012874ee973927e87fe` | [Blockscout](https://robinhoodchain.blockscout.com/address/0x14fc46155c4091bd7bf80012874ee973927e87fe) |
+
+Deployed in block 122,214,223 (transaction `0x114b7339bf618c8baea71a579716a42009ee5ebdbccd3f3817387ad770666e19`, 2,664,793 gas).
 
 The contract records tasks (owner, agent, token, budget, spent, per-call cap, deadline, status), a provider registry with a price per
 unit per token, approved providers with a cap per task, and one receipt per payment (task, provider, units, amount, price, token,
@@ -97,7 +102,7 @@ native ETH is rejected and fee-on-transfer tokens are refused.
 ## Verify a deployment
 
 ```
-npm run verify-deployment -- --contract <address> --contract-tx <creation tx>
+npm run verify-deployment -- --contract 0x14fc46155c4091bd7bf80012874ee973927e87fe --contract-tx 0x114b7339bf618c8baea71a579716a42009ee5ebdbccd3f3817387ad770666e19
 ```
 
 The script compares the bytecode on Robinhood Chain with the build in this repository and prints MATCH or the first difference.
@@ -142,11 +147,11 @@ no promised value. Any utility is planned only; tasks and payments use stablecoi
 | `KV_REST_API_URL` + `KV_REST_API_TOKEN` | Shared rate limits and redeem-once for the sample provider | `https://…` + token |
 | `STORE_KEY_PREFIX` | Key prefix in the shared store | text, default `gentpay:` |
 
-3. Contracts: run the site locally, open `/deploy` (localhost only), deploy `GentpayTaskBudgets` (no constructor arguments), register
-   the sample provider, paste address, block, creation tx and provider id into `src/config/contracts.ts`, then run
-   `npm run verify-deployment`. Remove `/deploy` once the source is verified.
+3. Contracts: deploy `GentpayTaskBudgets` (no constructor arguments) from any wallet, paste address, block and creation tx into
+   `src/config/contracts.ts`, run `npm run verify-deployment`, then register a sample provider on `/provider` ("Register this site's
+   sample provider") and set its id as `sampleProvider` in the same file.
 4. After the deploy: `/` answers 200, `/api/chain` returns a block number, `/api/provider/sample?topic=chain` answers 402 with a price,
-   and `/deploy` answers 404 on the public host.
+   and `/receipts?task=1` reads the contract.
 
 ## Contributing
 

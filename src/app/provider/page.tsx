@@ -2,7 +2,7 @@ import { BRAND } from "@/config/brand";
 import { pageMeta } from "@/lib/seo";
 import { RECEIPT_MAX_AGE } from "@/lib/server/provider";
 import { PageHead, Status } from "@/components/site/PageHead";
-import { Live402, RegisterProvider } from "@/components/app/ProviderTools";
+import { Live402, RegisterProvider, RegisterSampleProvider } from "@/components/app/ProviderTools";
 
 export const metadata = pageMeta({
   path: "/provider",
@@ -59,6 +59,7 @@ TASK_ID=1 AGENT_KEY=0x… node examples/agent.mjs ${BRAND.url}/api/provider/samp
             <p className="t-small dim mt-3">We call it x402-style: HTTP 402 then a retry with proof. The proof is a Gentpay receipt on chain, not the x402 payment header; no x402 client was tested.</p>
           </div>
         </div>
+        <RegisterSampleProvider />
         <RegisterProvider />
       </div>
     </>

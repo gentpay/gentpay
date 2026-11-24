@@ -33,7 +33,7 @@ export async function GET(request: Request) {
   } catch {
     return NextResponse.json({ error: "The chain could not be reached to read the price." }, { status: 503, headers: H });
   }
-  if (!q) return NextResponse.json({ error: "Not configured on this site yet: the Gentpay contract or the sample provider is not deployed/registered.", chainId: CHAIN.id }, { status: 503, headers: H });
+  if (!q) return NextResponse.json({ error: "Not configured on this site yet: the sample provider is not registered in the Gentpay contract yet.", chainId: CHAIN.id }, { status: 503, headers: H });
   if (!q.active || q.pricePerUnit === "0") return NextResponse.json({ error: "The sample provider is paused or has no price." }, { status: 503, headers: H });
 
   const header = request.headers.get(RECEIPT_HEADER);
